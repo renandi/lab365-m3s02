@@ -13,6 +13,10 @@ export default function ListagemProdutos() {
       .catch((err) => console.log("Erro ao obter produtos! ", err));
   }, []);
 
+  function handleDeleteProduto(id) {
+    setProdutos((prev) => prev.filter((p) => p.id !== id));
+  }
+
   return (
     <>
       <Typography variant="h2">Listagem de Produtos</Typography>
@@ -28,10 +32,12 @@ export default function ListagemProdutos() {
         {produtos.map((p) => (
           <CardProduto
             key={p.id}
+            id={p.id}
             nome={p.nome}
             preco={p.preco}
             descricao={p.descricao}
             imagem={p.imagem}
+            onDelete={handleDeleteProduto}
           />
         ))}
       </div>
