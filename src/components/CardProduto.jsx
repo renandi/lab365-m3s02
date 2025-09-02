@@ -7,13 +7,26 @@ import {
   CardMedia,
   CardActions,
 } from "@mui/material";
+import axios from "axios";
 
-export default function CardProduto({ id, nome, preco, descricao, imagem }) {
+export default function CardProduto({ id, nome, preco, descricao, imagem, onDelete }) {
+  function deletar() {
+    if (confirm("Tem certeza que deseja excluir?")) {
+      axios
+        .delete(`http://localhost:3001/produtos/${id}`)
+        .then(() => {
+          console.log("Produto excluido com sucesso!");
+          onDelete(id);
+        })
+        .catch((err) => console.log("Erro ao deletar produto! ", err));
+    }
+  }
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         sx={{ height: 140 }}
-        image={`https://picsum.photos/seed/${nome.replace(`"`,"")}/800/800`}
+        image={`https://picsum.photos/seed/${nome.replace(`"`, "")}/800/800`}
         title={nome}
       />
 
@@ -42,7 +55,9 @@ export default function CardProduto({ id, nome, preco, descricao, imagem }) {
 
       <CardActions style={{ justifyContent: "flex-end" }}>
         <Button size="small">Editar</Button>
-        <Button size="small">Deletar</Button>
+        <Button size="small" onClick={deletar}>
+          Deletar
+        </Button>
       </CardActions>
     </Card>
   );
