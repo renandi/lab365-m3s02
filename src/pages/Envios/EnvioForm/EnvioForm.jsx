@@ -21,6 +21,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function EnvioForm() {
   const [clientes, setClientes] = useState([]);
@@ -29,6 +30,9 @@ export default function EnvioForm() {
   const [clienteSelecionado, setClientSelecionado] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [brindes, setBrindes] = useState([]);
+
+  const navigate = useNavigate();
+  const params = useParams();
 
   useEffect(() => {
     axios
@@ -52,19 +56,59 @@ export default function EnvioForm() {
       });
   }, []);
 
+  useEffect(() => {
+    if (params.id) {
+      console.log(params.id)
+      axios
+        .get(`http://localhost:3001/envios/${params.id}`)
+        .then((res) => {
+          setClientSelecionado(res.data.cliente_id);
+          setBrindes(res.data.produtos_clientes);
+        })
+        .catch(() => console.log("Erro ao obter envio com id: " + params.id));
+    }
+  }, []);
+
   function adicionarProduto() {
     if (!produtoSelecionado) {
       alert("Selecione um produto!");
       return;
     }
 
-    setBrindes([...brindes, produtoSelecionado]);
+    const dadosDoProdutoSelecionado = produtos.find(
+      (p) => p.id === produtoSelecionado
+    );
+    setBrindes([...brindes, { ...dadosDoProdutoSelecionado, key: Date.now() }]);
   }
 
-//   console.log(brindes);
+  function salvarEnvio(event) {
+    event.preventDefault();
+
+    if (!clienteSelecionado) {
+      alert("Cliente é obrigatório!");
+    } else if (brindes.length === 0) {
+      alert("O envio deve conter pelo menos um item!");
+    } else {
+      axios({
+        url: params.id ? `http://localhost:3001/envios/${params.id}` : "http://localhost:3001/envios", 
+        data: {
+          cliente_id: clienteSelecionado,
+          produtos_clientes: brindes
+        },
+        method: params.id ? 'PUT' : "POST"
+        })
+        .then(() => {
+          alert("Envio realizado com sucesso!");
+          navigate("/");
+        })
+        .catch(() => alert("Erro ao cadastrar envio!"));
+    }
+  }
+
+  console.log(brindes);
 
   return (
-    <>
+    <form onSubmit={salvarEnvio}>
       <Card variant="outlined">
         <CardContent>
           <Typography as="h1">Cadastro de Produto</Typography>
@@ -93,7 +137,7 @@ export default function EnvioForm() {
                 label="Produto"
                 value={produtoSelecionado}
                 onChange={(e) => {
-                    setProdutoSelecionado(e.target.value)
+                  setProdutoSelecionado(e.target.value);
                 }}
               >
                 {produtos.map((prod) => (
@@ -123,30 +167,22 @@ export default function EnvioForm() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* {brindes.map((prod) => (
-                  <TableRow>
+                {brindes.map((prod) => (
+                  <TableRow key={prod.key}>
                     <TableCell>{prod.nome}</TableCell>
-                    <TableCell>R$ {prod.preco}</TableCell>
+                    <TableCell>
+                      {prod.preco.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </TableCell>
                     <TableCell>
                       <DeleteIcon style={{ color: "red" }} />
                     </TableCell>
                   </TableRow>
-                ))} */}
-                <TableRow>
-                  <TableCell>Boneco mascote</TableCell>
-                  <TableCell>R$ 12,00</TableCell>
-                  <TableCell>
-                    <DeleteIcon style={{ color: "red" }} />
-                  </TableCell>
-                </TableRow>
-
-                <TableRow>
-                  <TableCell>Caneca customizada</TableCell>
-                  <TableCell>R$ 15,00</TableCell>
-                  <TableCell>
-                    <DeleteIcon style={{ color: "red" }} />
-                  </TableCell>
-                </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -159,10 +195,12 @@ export default function EnvioForm() {
             style={{ marginTop: "20px" }}
           >
             <Typography>Valor total dos mimos: R$ 12,00</Typography>
-            <Button variant="outlined">Enviar para análise</Button>
+            <Button variant="outlined" type="submit">
+              Enviar para análise
+            </Button>
           </Box>
         </CardContent>
       </Card>
-    </>
+    </form>
   );
 }
