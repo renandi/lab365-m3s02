@@ -16,7 +16,7 @@ export default function CardProduto({ id, nome, preco, descricao, imagem, onDele
         .delete(`http://localhost:3001/produtos/${id}`)
         .then(() => {
           console.log("Produto excluido com sucesso!");
-          onDelete(id);
+          onDelete();
         })
         .catch((err) => console.log("Erro ao deletar produto! ", err));
     }
