@@ -13,7 +13,8 @@ function App() {
         <Route path="/" Component={EnvioList}/>
         <Route path="/envios/novo" Component={EnvioForm}/>
         <Route path="/envios/editar/:id" Component={EnvioForm}/>
-        <Route path='cadastroProduto' Component={CadastroProdutoForm}/>
+        <Route path='produtos/novo' Component={CadastroProdutoForm}/>
+        <Route path='produtos/editar/:id' Component={CadastroProdutoForm}/>
         <Route path='produtos' Component={ListagemProdutos}/>
       </Routes>
     </>

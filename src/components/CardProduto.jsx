@@ -8,8 +8,16 @@ import {
   CardActions,
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function CardProduto({ id, nome, preco, descricao, imagem, onDelete }) {
+  
+  const navigate = useNavigate()
+
+  function editar (id) {
+    navigate(`/produtos/editar/${id}`)
+  }
+
   function deletar() {
     if (confirm("Tem certeza que deseja excluir?")) {
       axios
@@ -54,7 +62,7 @@ export default function CardProduto({ id, nome, preco, descricao, imagem, onDele
       </CardContent>
 
       <CardActions style={{ justifyContent: "flex-end" }}>
-        <Button size="small">Editar</Button>
+        <Button size="small" onClick={()=>editar(id)}>Editar</Button>
         <Button size="small" onClick={deletar}>
           Deletar
         </Button>
