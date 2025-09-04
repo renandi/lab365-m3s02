@@ -6,15 +6,19 @@ import { Box, Typography } from "@mui/material";
 export default function ListagemProdutos() {
   const [produtos, setProdutos] = useState([]);
 
-  useEffect(() => {
+  function buscarProdutos() {
     axios
       .get("http://localhost:3001/produtos")
       .then((res) => setProdutos(res.data))
       .catch((err) => console.log("Erro ao obter produtos! ", err));
+  }
+
+  useEffect(() => {
+    buscarProdutos();
   }, []);
 
-  function handleDeleteProduto(id) {
-    setProdutos((prev) => prev.filter((p) => p.id !== id));
+  function handleDeleteProduto() {
+    buscarProdutos();
   }
 
   return (
