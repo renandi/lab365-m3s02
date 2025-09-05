@@ -1,10 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import CardProduto from "../../components/CardProduto";
-import { Box, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 
 export default function ListagemProdutos() {
   const [produtos, setProdutos] = useState([]);
+
+  const [busca, setBusca] = useState("");
 
   function buscarProdutos() {
     axios
@@ -21,9 +23,18 @@ export default function ListagemProdutos() {
     buscarProdutos();
   }
 
+  const produtosFiltrados = produtos.filter ((p)=> p.nome.toLowerCase().includes(busca.toLowerCase()));
+
   return (
     <>
-      <Typography variant="h2">Listagem de Produtos</Typography>
+      <Typography variant="h4" marginBottom="20px">Listagem de Produtos</Typography>
+
+      <TextField
+        label="Buscar produto"
+        variant="outlined"
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+      />
 
       <div
         style={{
@@ -33,7 +44,7 @@ export default function ListagemProdutos() {
           marginTop: "30px",
         }}
       >
-        {produtos.map((p) => (
+        {produtosFiltrados.map((p) => (
           <CardProduto
             key={p.id}
             id={p.id}
@@ -44,6 +55,11 @@ export default function ListagemProdutos() {
             onDelete={handleDeleteProduto}
           />
         ))}
+
+        {produtosFiltrados.length === 0 && (
+          <p>Nenhum produto encontrado.</p>
+        )
+        }
       </div>
     </>
   );
